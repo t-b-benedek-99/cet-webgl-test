@@ -3,8 +3,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity WebGL Player | Webapp</title>
-    <style>
+	<!--title>Unity WebGL Player | Webapp</title-->
+	<title>BOOKR Class player</title>
+	<style>
         html,
         body {
             width: 100%;
@@ -13,7 +14,7 @@
             margin: 0;
             color: black;
             position: relative;
-            background-color: #DBDFFC;
+            /* background-color: #DBDFFC;*/
       }
 
       video_player_box, canvas, iframe, video, figure {
@@ -109,11 +110,62 @@
 		background-color: #7D2BE6 !important;
 		font-size: 24px !important;
 	}
+	
+	#accessibility_toggle {
+		height: 45px;
+		width: 45px;
+		background-image: url("acc.gif");
+		background-repeat: no-repeat;
+		background-size: 45px 45px;
+		/* background-color: #C0C0C0; */
+		margin-top: 15px;
+		border: none;
+	}
+	
+	.acc_toggle_btn_bg_color_normal {
+		background-color: #C0C0C0;
+	}
+	
+	.acc_toggle_btn_bg_color_active {
+		background-color: #000000;
+	}
+	
+	.button-accessability-control {
+	
+	  margin-right: 10px;
+	  padding: 6px 14px;
+	  font-family: -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+	  border-radius: 6px;
+	  border: none;
+
+	  background: #6E6D70;
+	  box-shadow: 0px 0.5px 1px rgba(0, 0, 0, 0.1), inset 0px 0.5px 0.5px rgba(255, 255, 255, 0.5), 0px 0px 0px 0.5px rgba(0, 0, 0, 0.12);
+	  color: #DFDEDF;
+	  user-select: none;
+	  -webkit-user-select: none;
+	  touch-action: manipulation;
+	}
+
+	.button-accessability-control:focus {
+	  box-shadow: inset 0px 0.8px 0px -0.25px rgba(255, 255, 255, 0.2), 0px 0.5px 1px rgba(0, 0, 0, 0.1), 0px 0px 0px 3.5px rgba(58, 108, 217, 0.5);
+	  outline: 0;
+	}
 
     </style>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
   </head>
-  <body style="text-align: center">
+  <body style="text-align: center; background-color: #ffffff;">
+	<button style="display: none;" id="accessibility_toggle" onclick="toggleAccessabilityMode()" role="button" aria-label="Accessibility mode" aria-labelledby="Accessibility mode" alt="Accessibility Mode" class="acc_toggle_btn_bg_color_active"></button>
+	<div style="display: none;" id="accessability_buttons" role="navigation" aria-label="Player controls">
+		<button onclick="startBook()"role="button" alt="Play the Book" class="btn btn-primary button-accessability-control" aria-label="Play" aria-labelledby="Play">Play</button>
+		<button onclick="pauseBook()" role="button" alt="Pause the Book" class="btn btn-primary button-accessability-control"aria-label="Pause the Book" aria-labelledby="Pause the Book">Pause</button>
+		<button onclick="turnToNextPage()" role="button" alt="Turn to the Next Page" class="btn btn-primary button-accessability-control" aria-label="Next Page" aria-labelledby="Next Page">Next Page</button>
+		<button onclick="turnToPrevPage()" role="button" alt="Turn to the Previous Page"  class="btn btn-primary button-accessability-control" aria-label="Previous Page" aria-labelledby="Previous Page">Previous Page</button>
+		<button onclick="toggleNarration()" role="button" alt="Toggle the Narration"  class="btn btn-primary button-accessability-control" aria-label="Toggle the Narration" aria-labelledby="Toggle the Narration">Toggle the Narration</button>
+		<button onclick="toggleAutomaticPageTurn()" role="button" alt="Toggle the Automatic Page Turn Function" class="btn btn-primary button-accessability-control" aria-label="Automatic page turn" aria-labelledby="Automatic page turn">Toggle Automatic Page Turn</button>
+	</div>
+
+
 	<!-- Book Not Free Popup Modal -->
 	<div class="modal fade" id="bookNotFreeModal" tabindex="-1" role="dialog" aria-labelledby="bookNotFreeModalTitle" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered" role="document">
@@ -166,7 +218,7 @@
 	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    <script src="Build/CET_BookrClass_WebGL_Unity_Build_2023_04_26_11_29.loader.js"></script>
+    <script src="Build/cet-webapp.loader.js"></script>
     <script src="baseFunctions.js"></script>
     <script src="index.js"></script>
     <script>
@@ -181,18 +233,23 @@
           let myobj2 = document.getElementById("book-list");
           myobj2.remove();
 
+		  alert = function(message) {
+    		console.log(message);
+		  }
+
           createUnityInstance(document.querySelector("#unity-canvas"), {
-            dataUrl: "Build/e9d9ef36d119eeee101332288966b61a.data.unityweb",
-            frameworkUrl: "Build/9cfc9968771c73762304ed5abe46f39e.js.unityweb",
-            codeUrl: "Build/bdd4618fc27bf9a45db6b64125e5f8ca.wasm.unityweb",
+            dataUrl: "Build/0fe6bd9089bba416ce2e5ae5cafca8d2.data.unityweb",
+            frameworkUrl: "Build/c6e8c22e61d82993e01718509df7b016.js.unityweb",
+            codeUrl: "Build/84d333ca809bdae16e27109853c8fec7.wasm.unityweb",
             streamingAssetsUrl: "StreamingAssets",
             companyName: "Bookr",
             productName: "Webapp",
-            productVersion: "1.2.5",
+            productVersion: "1.3.4",
           }).then((unityInstance) => {
 			window.unityInstance = unityInstance;
 		  });
       }
     </script>
+
   </body>
 </html>
